@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:wallpaper/data/data.dart';
+import 'package:wallpaper/model/categories_model.dart';
 import 'package:wallpaper/widget/widget.dart';
 
 class Home extends StatefulWidget {
@@ -9,6 +11,12 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  List<CategoriesModel> categories = [];
+  void initState() {
+    categories = getCategories();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,18 +32,52 @@ class _HomeState extends State<Home> {
             borderRadius: BorderRadius.circular(30)),
         child: Column(
           children: [
-            Row(
-              children: const [
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(hintText: 'Search Wallpaper'),
+            Container(
+              child: Row(
+                children: const [
+                  Expanded(
+                    child: TextField(
+                      decoration: InputDecoration(hintText: 'Search Wallpaper'),
+                    ),
                   ),
-                ),
-                Icon(Icons.search)
-              ],
+                  Icon(Icons.search)
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 16,
+            ),
+            ListView.builder(
+              itemBuilder: (context, index) {
+                return CategoriesTile(
+                    imgUrl: categories[index].imageUrl,
+                    title: categories[index].categoriesName);
+              },
+              itemCount: categories.length,
+              shrinkWrap: true,
             )
           ],
         ),
+      ),
+    );
+  }
+}
+
+class CategoriesTile extends StatelessWidget {
+  final String imgUrl, title;
+  CategoriesTile({required this.imgUrl, required this.title});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Stack(
+        children: [
+          Container(
+            child: Image.network(imgUrl),
+          ),
+          Container(
+            child: Text(title),
+          )
+        ],
       ),
     );
   }
