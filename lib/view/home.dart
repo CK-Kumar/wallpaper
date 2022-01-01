@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wallpaper/data/data.dart';
 import 'package:wallpaper/model/categories_model.dart';
 import 'package:wallpaper/widget/widget.dart';
+import 'package:http/http.dart' as http;
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -12,7 +13,14 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List<CategoriesModel> categories = [];
+  getTrendingWallpapers() async {
+    var response = await http.get(
+        Uri.parse('https://api.pexels.com/v1/curated'),
+        headers: {'Authorization': apiKey});
+  }
+
   void initState() {
+    getTrendingWallpapers();
     categories = getCategories();
     super.initState();
   }
@@ -47,14 +55,19 @@ class _HomeState extends State<Home> {
             const SizedBox(
               height: 16,
             ),
-            ListView.builder(
-              itemBuilder: (context, index) {
-                return CategoriesTile(
-                    imgUrl: categories[index].imageUrl,
-                    title: categories[index].categoriesName);
-              },
-              itemCount: categories.length,
-              shrinkWrap: true,
+            Container(
+              height: 80,
+              child: ListView.builder(
+                itemBuilder: (context, index) {
+                  return CategoriesTile(
+                      imgUrl: categories[index].imageUrl,
+                      title: categories[index].categoriesName);
+                },
+                itemCount: categories.length,
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+              ),
             )
           ],
         ),
@@ -69,13 +82,30 @@ class CategoriesTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: EdgeInsets.only(right: 4),
       child: Stack(
         children: [
-          Container(
-            child: Image.network(imgUrl),
+          ClipRRect(
+            child: Image.network(
+              imgUrl,
+              height: 50,
+              width: 100,
+              fit: BoxFit.cover,
+            ),
+            borderRadius: BorderRadius.circular(8),
           ),
           Container(
-            child: Text(title),
+            color: Colors.black26,
+            alignment: Alignment.center,
+            height: 50,
+            width: 100,
+            child: Text(
+              title,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 15),
+            ),
           )
         ],
       ),
